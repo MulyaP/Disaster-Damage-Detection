@@ -212,15 +212,32 @@ def main():
         improved = vl_mf1 > best_val_f1
         if improved:
             best_val_f1 = vl_mf1
-            torch.save({
-                "epoch":               epoch,
-                "model_state_dict":    model.state_dict(),
+            ckpt = {
+                "epoch":                epoch,
+                "model_state_dict":     model.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
                 "scheduler_state_dict": scheduler.state_dict(),
-                "scaler_state_dict":   scaler.state_dict(),
-                "val_mean_f1":         vl_mf1,
-                "val_f1s":             vl_f1s,
-            }, SAVE_PATH)
+                "scaler_state_dict":    scaler.state_dict(),
+                "val_mean_f1":          vl_mf1,
+                "val_f1s":              vl_f1s,
+            }
+            torch.save(ckpt, SAVE_PATH)
+            drive_roots = [
+                os.path.expanduser("~/GoogleDrive/MyDrive"),
+                os.path.expanduser("~/google-drive/MyDrive"),
+                os.path.expanduser("~/Drive/MyDrive"),
+                "/mnt/gdrive/MyDrive",
+                "/media/gdrive/MyDrive",
+            ]
+            for root in drive_roots:
+                drive_dest = os.path.join(root, "ATML_project", "Phase-2 weights", "best_expD_model.pth")
+                if os.path.isdir(os.path.dirname(drive_dest)) or os.path.isdir(root):
+                    os.makedirs(os.path.dirname(drive_dest), exist_ok=True)
+                    torch.save(ckpt, drive_dest)
+                    print(f"Saved to Drive: {drive_dest}")
+                    break
+            else:
+                print("Drive not found — skipping Drive save.")
 
         status    = "\u2713" if improved else "\u2717"
         f1_detail = "  ".join(f"{n}={f:.3f}" for n, f in zip(class_names, vl_f1s))
