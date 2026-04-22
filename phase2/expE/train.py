@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 
 import torch
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from tqdm import tqdm
 
@@ -30,10 +30,11 @@ EPOCHS          = 50
 WARMUP_EPOCHS   = 5
 FOCAL_GAMMA     = 2.0
 LOC_LOSS_WEIGHT = 1.0
-DMG_LOSS_WEIGHT = 0.7        # reduced from 1.0 — dmg loss was overfit-driving mF1 plateau
-EMD_LOSS_WEIGHT = 0.5
-LABEL_SMOOTHING = 0.1        # softens damage targets to reduce overconfidence
-DROPOUT         = 0.3
+DMG_LOSS_WEIGHT    = 0.7        # reduced from 1.0 — dmg loss was overfit-driving mF1 plateau
+EMD_LOSS_WEIGHT    = 0.5
+LABEL_SMOOTHING    = 0.1        # softens damage targets to reduce overconfidence
+MINOR_WEIGHT_BOOST = 1.5        # explicit multiplier on top of inverse-freq for minor class
+DROPOUT            = 0.4        # increased from 0.3 to close train/val mF1 gap
 DMG_CLASSES     = 5          # 0=bg 1=no-dmg 2=minor 3=major 4=destroyed
 PATIENCE        = 10         # early stopping
 GRAD_CLIP       = 1.0        # max gradient norm
@@ -44,7 +45,12 @@ PHASE1_CKPT     = "best_model.pth"
 
 
 def compute_dmg_weights(dataset):
-    """Inverse-frequency class weights over tile-cropped post masks only."""
+    """Inverse-frequency class weights with an explicit boost for the minor class.
+
+    weights tensor layout (after cat): [bg=0, no-dmg, minor, major, destr]
+    The minor boost is applied before renormalisation so all weights still sum
+    to (DMG_CLASSES - 1), keeping the overall loss scale stable.
+    """
     counts = collections.Counter()
     for _, _, _, post_mask_path, r, c in dataset.tiles:
         arr = np.array(Image.open(post_mask_path))[r:r + TILE_SIZE, c:c + TILE_SIZE]
@@ -55,6 +61,7 @@ def compute_dmg_weights(dataset):
         [total / ((DMG_CLASSES - 1) * max(counts[v], 1)) for v in range(1, DMG_CLASSES)],
         dtype=torch.float32
     )
+    weights[1] *= MINOR_WEIGHT_BOOST  # index 1 = minor (tensor is 0-indexed over classes 1..4)
     weights = weights / weights.sum() * (DMG_CLASSES - 1)
     return torch.cat([torch.zeros(1), weights])  # index 0 = background (ignored)
 
@@ -104,7 +111,7 @@ def run_epoch(model, loader, loc_criterion, dmg_criterion, emd_criterion,
             loc_mask = loc_mask.to(DEVICE)
             dmg_mask = dmg_mask.to(DEVICE)
 
-            with autocast():
+            with autocast("cuda"):
                 loc_out, dmg_out = model(pre, post)
                 loc_loss = loc_criterion(loc_out, loc_mask)
                 dmg_loss = dmg_criterion(dmg_out, dmg_mask)
@@ -184,9 +191,9 @@ def main():
         {"params": model.dmg_reduce_low.parameters(),  "lr": LR},
         {"params": model.loc_head.parameters(),        "lr": LR},
         {"params": model.dmg_head.parameters(),        "lr": LR},
-    ], weight_decay=1e-4)
+    ], weight_decay=5e-4)
 
-    scaler = GradScaler()
+    scaler = GradScaler("cuda")
 
     best_val_f1     = 0.0
     patience_counter = 0

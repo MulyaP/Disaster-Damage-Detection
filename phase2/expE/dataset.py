@@ -75,6 +75,12 @@ class XBDJointDataset(Dataset):
                                                 random.uniform(0.8, 1.2))
                 post_img = TF.adjust_brightness(TF.adjust_contrast(post_img, random.uniform(0.8, 1.2)),
                                                 random.uniform(0.8, 1.2))
+            if random.random() > 0.5:
+                # kernel size must be odd; sample from {3, 5, 7}
+                k = random.choice([3, 5, 7])
+                sigma = random.uniform(0.5, 1.5)
+                pre_img  = TF.gaussian_blur(pre_img,  kernel_size=k, sigma=sigma)
+                post_img = TF.gaussian_blur(post_img, kernel_size=k, sigma=sigma)
 
         pre_t  = TF.normalize(TF.to_tensor(pre_img),  MEAN, STD)
         post_t = TF.normalize(TF.to_tensor(post_img), MEAN, STD)
