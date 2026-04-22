@@ -4,15 +4,17 @@ import torch.nn.functional as F
 
 
 class FocalLoss(nn.Module):
-    def __init__(self, gamma=2.0, weight=None, ignore_index=0):
+    def __init__(self, gamma=2.0, weight=None, ignore_index=0, label_smoothing=0.0):
         super().__init__()
-        self.gamma        = gamma
-        self.weight       = weight
-        self.ignore_index = ignore_index
+        self.gamma           = gamma
+        self.weight          = weight
+        self.ignore_index    = ignore_index
+        self.label_smoothing = label_smoothing
 
     def forward(self, logits, targets):
         ce   = F.cross_entropy(logits, targets, weight=self.weight,
-                               ignore_index=self.ignore_index, reduction="none")
+                               ignore_index=self.ignore_index, reduction="none",
+                               label_smoothing=self.label_smoothing)
         pt   = torch.exp(-ce)
         loss = ((1 - pt) ** self.gamma) * ce
         # ignore_index positions have ce=0, safe to mean over all
