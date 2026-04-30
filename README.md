@@ -1,6 +1,6 @@
 # Satellite Disaster Damage Assessment
 
-A two-phase deep learning pipeline for building localization and damage classification from pre/post-disaster satellite imagery, trained on the [xBD dataset](KAGGLE_LINK_HERE).
+A two-phase deep learning pipeline for building localization and damage classification from pre/post-disaster satellite imagery, trained on the [xBD dataset](https://www.kaggle.com/datasets/qianlanzz/xbd-dataset).
 
 **Phase 1** segments building footprints in pre-disaster images. **Phase 2** jointly localizes buildings and classifies damage severity in post-disaster images.
 
@@ -127,7 +127,7 @@ To evaluate the Phase 2 model you can either train from scratch (above) or downl
 
 ### Download pre-trained weights
 
-Download `best_joint_model.pth` from: **DRIVE_LINK_HERE**
+Download `best_joint_model.pth` from: https://drive.google.com/file/d/1_ULPMVJHhbIkzYo24qt2-F3RxP9ZBalk/view?usp=sharing
 
 Place the file in the project root:
 
@@ -149,13 +149,3 @@ This evaluates on the test split by default and prints:
 - Combined score (`0.3 × loc_F1 + 0.7 × dmg_F1`)
 
 Prediction visualizations are saved to `eval_samples/`.
-
-Optional arguments:
-
-```bash
-# Evaluate on the validation (hold) split instead
-python P2_evaluate.py --split hold
-
-# Use a custom checkpoint path
-python P2_evaluate.py --checkpoint path/to/checkpoint.pth
-```
