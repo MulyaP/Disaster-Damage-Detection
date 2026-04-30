@@ -2,8 +2,8 @@ import torch
 import numpy as np
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from dataset import XBDSegDataset
-from model import DeepLabV3Plus
+from P1_dataset import XBDSegDataset
+from P1_model import DeepLabV3Plus
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 8

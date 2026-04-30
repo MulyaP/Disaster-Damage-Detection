@@ -2,8 +2,8 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
-from dataset import XBDSegDataset
-from model import DeepLabV3Plus
+from P1_dataset import XBDSegDataset
+from P1_model import DeepLabV3Plus
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 

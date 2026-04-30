@@ -84,7 +84,13 @@ def _save_samples(samples: list, out_dir: str, n: int) -> None:
         loc_gt_vis    = (loc_gt.squeeze().numpy() > 0.5).astype(np.uint8) * 255
         loc_pred_vis  = (loc_prob.squeeze().numpy() > 0.5).astype(np.uint8) * 255
         dmg_gt_vis    = _dmg_colormap(dmg_gt.numpy())
-        dmg_pred_vis  = _dmg_colormap(dmg_pred.numpy())
+        # Mask damage prediction to predicted building footprint so background
+        # pixels (loc_prob ≤ 0.5) are shown as black (class 0) rather than
+        # being assigned a spurious damage color by argmax.
+        bldg_mask         = (loc_prob.squeeze().numpy() > 0.5)
+        dmg_pred_masked   = dmg_pred.numpy().copy()
+        dmg_pred_masked[~bldg_mask] = 0
+        dmg_pred_vis      = _dmg_colormap(dmg_pred_masked)
 
         fig, axes = plt.subplots(2, 3, figsize=(15, 10))
         for ax, img, title in zip(
