@@ -88,7 +88,7 @@ def train():
                 "optimizer_state_dict": optimizer.state_dict(),
                 "val_iou": val_iou,
                 "val_dice": val_dice,
-            }, "best_model.pth")
+            }, "best_model_p1.pth")
             print(f"  -> saved best model (iou={val_iou:.4f}, dice={val_dice:.4f})")
 
 

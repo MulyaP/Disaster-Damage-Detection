@@ -35,8 +35,8 @@ EMD_LOSS_WEIGHT = 0.5        # ordinal penalty on top of focal
 DROPOUT         = 0.3
 DMG_CLASSES     = 5          # 0=bg 1=no-dmg 2=minor 3=major 4=destroyed
 DEVICE          = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-SAVE_PATH       = "best_expD_model.pth"
-PHASE1_CKPT     = "best_model.pth"
+SAVE_PATH       = "best_model_p2.pth"
+PHASE1_CKPT     = "best_model_p1.pth"
 # ──────────────────────────────────────────────────────────────────────────────
 
 
