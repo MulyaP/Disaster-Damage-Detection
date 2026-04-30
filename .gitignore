@@ -1,3 +1,7 @@
 xbd/
-best_model.pth
+*.pth
 best_model/
+venv/
+__pycache__/
+eval_samples/
+

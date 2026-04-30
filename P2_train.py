@@ -12,11 +12,10 @@ from torch.cuda.amp import GradScaler, autocast
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from tqdm import tqdm
 
-from losses import FocalLoss, BinaryFocalLoss, EMDLoss
-from dataset import XBDJointDataset
+from P2_losses import FocalLoss, BinaryFocalLoss, EMDLoss
+from P2_dataset import XBDJointDataset, TILE_SIZE
 from P2_model import JointDamageNet
 
-from dataset import TILE_SIZE
 
 # ── Config ────────────────────────────────────────────────────────────────────
 BASE_DIR        = "xbd"

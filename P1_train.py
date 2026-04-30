@@ -2,10 +2,12 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from dataset import XBDSegDataset
-from model import DeepLabV3Plus
+from P1_dataset import XBDSegDataset
+from P1_model import DeepLabV3Plus
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"[Device] Using: {DEVICE.upper()}" +
+      (f" ({torch.cuda.get_device_name(0)})" if DEVICE == "cuda" else " (no GPU found)"))
 EPOCHS = 30
 BATCH_SIZE = 8
 LR = 1e-4
