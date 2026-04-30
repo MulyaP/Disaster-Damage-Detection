@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from losses import FocalLoss, BinaryFocalLoss, EMDLoss
 from dataset import XBDJointDataset
-from model import JointDamageNet
+from P2_model import JointDamageNet
 
 from dataset import TILE_SIZE
 
