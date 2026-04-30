@@ -56,7 +56,7 @@ cd NCSU-ATML-Project
 
 ### 2. Download and extract the xBD dataset
 
-Download the xBD dataset from Kaggle: **KAGGLE_LINK_HERE**
+Download the xBD dataset from Kaggle: (https://www.kaggle.com/datasets/qianlanzz/xbd-dataset)
 
 Extract the archive directly into the project directory so the layout looks like:
 
